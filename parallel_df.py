@@ -7,7 +7,34 @@ def runDataFrame(args):
   r = func(*args[3:])
   q.put({ 'pid': job_idx, 'results': r })
 
-def runParallel(df_idx=-1, split_axis=1, njobs=None, func=None, return_method='raw', args=[]):
+def runParallelDataFrames(df_idx=-1, njobs=None, func=None, args=[]):
+  dfs = args[df_idx]
+  # Determine the number of splits.
+  # If njobs is not provided, use the number of CPU cores
+  if njobs is None:
+    njobs = cpu_count()
+
+  m = Manager()
+  q = m.Queue()
+  pool = Pool(processes=njobs)
+  passing_args = list()
+  for i in range(len(dfs)):
+    # one_arg: job_idx, func, q, arg0, arg1, ... df[i], argx, argy ...
+    one_arg = [i, func, q]
+    one_arg.extend(args[:df_idx])
+    one_arg.append(dfs[i])
+    one_arg.extend(args[df_idx+1:])
+    passing_args.append(one_arg)
+  pool.map(runDataFrame, passing_args)
+
+  # Reduce
+  results = list()
+  while not q.empty():
+    results.append(q.get())
+  results.sort(key=lambda x: x['pid'])
+  return [ r['results'] for r in results ]
+
+def runParallelColumns(df_idx=-1, split_axis=1, njobs=None, func=None, return_method='raw', args=[]):
   '''
   :param df_idx: which index in args represents the DataFrame object to split
   :param split_axis: along which axis to split
