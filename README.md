@@ -58,3 +58,22 @@ for df in df_list:
 runParallelDataFrames(df_idx=0, func=myFunc, args=[df_list, arg1, arg2])
 # Note how df_list replaces df as the first argument in args
 ```
+
+## Sample Code
+*parallel_test.py* contains sample code that runs the two methods described above. 
+From testing on my MacBook Pro, which has 4 physical cores and 8 virtual cores, the speedup is significant:
+
+```
+Running multiple processes (DataFrame) ... 
+Multiple processes used 25.10401701927185 seconds
+Running single process (DataFrame) ... 
+Single process used 55.779911041259766 seconds
+Verified that the results look ok
+Running multiple processes ... 
+Multiple processes used 5.296130180358887 seconds
+Running single process ... 
+Single process used 10.57194709777832 seconds
+Verified that the results look ok
+```
+
+Running with multiple processes is about twice as fast as single thread. 
