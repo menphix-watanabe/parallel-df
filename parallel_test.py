@@ -5,10 +5,7 @@ import pandas as pd
 import random
 import os
 import math
-import hashlib
-from multiprocessing import Queue, Pool, cpu_count, Manager
 import time
-import numpy as np
 import parallel_df
 
 INPUT_FILE = 'input_data.csv'
@@ -100,8 +97,6 @@ def main():
     for c in rdf_s.columns:
       assert (rdf[c][0] == rdf_s[c][0])
   print("Verified that the results look ok")
-
-  return 0
 
   # Parallel Columns
   print("Running multiple processes ... ")
